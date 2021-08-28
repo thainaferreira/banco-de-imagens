@@ -11,6 +11,10 @@ env.read_env()
 valid_extention = ('png', 'jpg', 'gif')
 file_path = env('FILES_DIRECTORY')
 
+max_length = env('MAX_CONTENT_LENGTH')
+max_length = int(max_length.split('M')[0]) * 1024 * 1024 
+
+
 
 def verify_exists(file: str) -> bool:
     """
@@ -34,7 +38,6 @@ def verify_exists(file: str) -> bool:
     return False
 
 
-
 def post_file() -> dict:
     """
     Recebe um arquivo de um formulario HTML e se atender à todas as condições é salvo em uma pasta do seu determinado tipo
@@ -56,19 +59,11 @@ def post_file() -> dict:
     if not file_extention in valid_extention:
         return {'message': f'{file_name} não contém uma extensão valida'}, 415
 
-    file.save(f'/tmp/{file_name}')    
+    path = safe_join(file_path, file_extention, file_name)
     
-    file_length = os.stat(f'/tmp/{file_name}').st_size
-    max_length = env('MAX_CONTENT_LENGTH')
-    
-    if (float(file_length) < float(max_length)):
-        path = safe_join(file_path, file_extention, file_name)
-        
-        file.save(path)
+    file.save(path)
 
-        return {'message': f'Upload do arquivo {file_name} realizado com sucesso!'}, 201
-
-    return {'message': f'O arquivo {file_name} possui {round(file_length/1e6, 2)}MB e excedeu o limite de {round(float(max_length)/1e6, 2)}MB'}, 413
+    return {'message': f'Upload do arquivo {file_name} realizado com sucesso!'}, 201
 
 
 def all_files() -> dict:

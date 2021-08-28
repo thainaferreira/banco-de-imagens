@@ -1,8 +1,10 @@
 from flask import Flask
 from werkzeug.exceptions import NotFound, BadRequestKeyError
-from .kenzie.image import post_file, all_files, types_files, download_file, download_zip
+from .kenzie.image import post_file, all_files, types_files, download_file, download_zip, max_length
 
 app = Flask(__name__)
+
+app.config['MAX_CONTENT_LENGTH'] = max_length
 
 @app.post('/upload')
 def post_form():
